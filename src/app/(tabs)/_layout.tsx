@@ -6,7 +6,11 @@ import type { IconName } from '@/components/ui';
 import { useNotifications } from '@/lib/data';
 import { colors } from '@/lib/theme';
 
-const icon = (name: IconName) => ({ color, size }: { color: ColorValue; size: number }) => <Ionicons name={name} size={size} color={color as string} />;
+function icon(name: IconName) {
+  return function TabIcon({ color, size }: { color: ColorValue; size: number }) {
+    return <Ionicons name={name} size={size} color={color as string} />;
+  };
+}
 
 export default function TabsLayout() {
   const notes = useNotifications();

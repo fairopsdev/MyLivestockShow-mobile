@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, Switch, Text, View } from 'react-native';
 
 import { Questions, missingAnswer, type Question } from '@/components/Questions';
@@ -33,8 +33,8 @@ export default function NewEntry() {
   const { divisions, classes } = useMemo(() => entryCatalog(w?.divisions || [], w?.classes || []), [w]);
 
   const [step, setStep] = useState(0);
-  const [exMode, setExMode] = useState<'existing' | 'new'>('existing');
-  const [exhibitorId, setExhibitorId] = useState('');
+  const [exModePicked, setExMode] = useState<'existing' | 'new'>('existing');
+  const [exhibitorPicked, setExhibitorId] = useState('');
   const [newEx, setNewEx] = useState(BLANK_EXHIBITOR);
   const [deptId, setDeptId] = useState('');
   const [divId, setDivId] = useState('');
@@ -49,10 +49,9 @@ export default function NewEntry() {
   const [error, setError] = useState('');
   const [added, setAdded] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (w?.exhibitors.length && !exhibitorId) setExhibitorId(w.exhibitors[0].id);
-    if (w && !w.exhibitors.length) setExMode('new');
-  }, [w, exhibitorId]);
+  // First-timers have no saved exhibitor yet; everyone else starts on their first one.
+  const exMode = w && !w.exhibitors.length ? 'new' : exModePicked;
+  const exhibitorId = exhibitorPicked || w?.exhibitors[0]?.id || '';
 
   if (q.isLoading) return <Loading label="Loading the show…" />;
   if (q.error || !w) return <Screen><Notice tone="error">{errorText(q.error)}</Notice></Screen>;

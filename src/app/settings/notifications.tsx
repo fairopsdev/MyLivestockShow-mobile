@@ -11,24 +11,24 @@ import { colors } from '@/lib/theme';
 export default function NotificationSettings() {
   const qc = useQueryClient();
   const q = usePrefs();
-  const [prefs, setPrefs] = useState<Record<string, boolean>>({});
+  const [changed, setChanged] = useState<Record<string, boolean>>({});
+  const prefs: Record<string, boolean> = { ...(q.data?.prefs || {}), ...changed };
   const [perm, setPerm] = useState<PushState | null>(null);
   const [error, setError] = useState('');
   const [test, setTest] = useState('');
   const [testing, setTesting] = useState(false);
 
-  useEffect(() => { if (q.data) setPrefs(q.data.prefs); }, [q.data]);
   useEffect(() => { pushPermission().then(setPerm).catch(() => null); }, []);
 
   const toggle = async (key: string, on: boolean) => {
     setError('');
-    const next = { ...prefs, [key]: on };
-    setPrefs(next);
+    const before = changed;
+    setChanged({ ...changed, [key]: on });
     try {
       await call('mobileApp', { action: 'savePreferences', prefs: { [key]: on } });
       qc.invalidateQueries({ queryKey: keys.prefs });
     } catch (e) {
-      setPrefs(prefs);
+      setChanged(before);
       setError(errorText(e));
     }
   };

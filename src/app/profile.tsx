@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import * as WebBrowser from 'expo-web-browser';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Text } from 'react-native';
 
 import { Button, Card, Field, Loading, Muted, Notice, Screen, SectionTitle } from '@/components/ui';
@@ -27,13 +27,11 @@ export default function Profile() {
   const qc = useQueryClient();
   const { refreshUser } = useAuth();
   const q = useProfile();
-  const [form, setForm] = useState<Record<string, string>>({});
+  const [edits, setEdits] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
 
-  useEffect(() => {
-    if (q.data?.account) setForm(Object.fromEntries(FIELDS.map(([k]) => [k, q.data.account[k] || ''])));
-  }, [q.data]);
+  const form: Record<string, string> = Object.fromEntries(FIELDS.map(([k]) => [k, edits[k] ?? q.data?.account?.[k] ?? '']));
 
   const save = async () => {
     setMsg(null);
@@ -41,6 +39,7 @@ export default function Profile() {
     try {
       await call('exhibitorPortal', { action: 'saveAccount', account: form });
       await Promise.all([qc.invalidateQueries({ queryKey: keys.profile }), refreshUser().catch(() => null)]);
+      setEdits({});
       setMsg({ tone: 'success', text: 'Saved.' });
     } catch (e) {
       setMsg({ tone: 'error', text: errorText(e) });
@@ -58,7 +57,7 @@ export default function Profile() {
       <Card>
         <Muted>{q.data?.account?.email}</Muted>
         {FIELDS.map(([k, label, props]) => (
-          <Field key={k} label={label} value={form[k] || ''} onChangeText={(v) => setForm((f) => ({ ...f, [k]: v }))} {...(props || {})} />
+          <Field key={k} label={label} value={form[k] || ''} onChangeText={(v) => setEdits((f) => ({ ...f, [k]: v }))} {...(props || {})} />
         ))}
         {msg ? <Notice tone={msg.tone}>{msg.text}</Notice> : null}
         <Button title="Save" onPress={save} loading={busy} />

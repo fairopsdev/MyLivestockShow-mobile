@@ -29,11 +29,13 @@ async function ensureChannels() {
   if (Platform.OS !== 'android') return;
   await Notifications.setNotificationChannelAsync('default', {
     name: 'Updates',
+    // eslint-disable-next-line import/namespace -- exported enum the lint rule can't see
     importance: Notifications.AndroidImportance.DEFAULT,
   });
   // "Your class is up" alerts should break through.
   await Notifications.setNotificationChannelAsync('ring', {
     name: 'My class is up',
+    // eslint-disable-next-line import/namespace -- exported enum the lint rule can't see
     importance: Notifications.AndroidImportance.HIGH,
     vibrationPattern: [0, 300, 200, 300],
     lightColor: '#C8A24A',

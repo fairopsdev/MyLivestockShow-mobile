@@ -16,10 +16,12 @@ export default function Live() {
   const params = useLocalSearchParams<{ tab?: string; fair?: string }>();
   const { fair, fairs, setFairId } = useCurrentFair();
   const [tab, setTab] = useState<'ring' | 'results'>(params.tab === 'results' ? 'results' : 'ring');
-
-  useEffect(() => {
+  // Opening this tab from a notification or a Home card picks the view.
+  const [lastParam, setLastParam] = useState(params.tab);
+  if (params.tab !== lastParam) {
+    setLastParam(params.tab);
     if (params.tab === 'results' || params.tab === 'ring') setTab(params.tab);
-  }, [params.tab]);
+  }
   useEffect(() => {
     if (params.fair && fairs.some((f) => f.id === params.fair)) setFairId(params.fair);
   }, [params.fair, fairs, setFairId]);
