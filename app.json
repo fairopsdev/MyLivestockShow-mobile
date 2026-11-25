@@ -65,8 +65,14 @@
     },
     "extra": {
       "eas": {
-        "projectId": ""
+        "projectId": "131176cb-a498-4354-b66f-6c131a062dc3"
+      },
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
       }
-    }
+    },
+    "owner": "faircentral"
   }
 }
