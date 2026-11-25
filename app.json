@@ -1,0 +1,72 @@
+{
+  "expo": {
+    "name": "MyLivestockShow",
+    "slug": "mylivestockshow",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "mylivestockshow",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F4F5F8",
+    "ios": {
+      "bundleIdentifier": "com.faircentral.mylivestockshow",
+      "buildNumber": "1",
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "package": "com.faircentral.mylivestockshow",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "monochromeImage": "./assets/images/adaptive-icon-monochrome.png",
+        "backgroundColor": "#14284B"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#14284B",
+          "defaultChannel": "default"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "MyLivestockShow uses your photos so you can attach a picture of the scale or an entry document.",
+          "cameraPermission": "MyLivestockShow uses the camera so you can photograph the scale at weigh-in or an entry document."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#14284B",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 160
+        }
+      ]
+    ],
+    "experiments": {
+      "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": ""
+      }
+    }
+  }
+}
