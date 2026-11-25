@@ -135,7 +135,7 @@ function ResultsView({ q, fairId }: { q: ReturnType<typeof useFairResults>; fair
       && words.every((w) => `${r.class_name} ${r.department_name} ${r.exhibitor_name} ${r.animal_name}`.toLowerCase().includes(w)));
     const map = new Map<string, { title: string; dept: string; rows: any[] }>();
     for (const r of rows) {
-      const g = map.get(r.class_id) || { title: r.class_name, dept: r.department_name, rows: [] };
+      const g = map.get(r.class_id) || { title: r.class_name, dept: r.department_name, rows: [] as any[] };
       g.rows.push(r);
       map.set(r.class_id, g);
     }

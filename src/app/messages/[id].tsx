@@ -16,7 +16,7 @@ export default function Thread() {
   const qc = useQueryClient();
   const q = useThread(id);
   const insets = useSafeAreaInsets();
-  const scroll = useRef<ScrollView>(null);
+  const scroll = useRef<any>(null);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');

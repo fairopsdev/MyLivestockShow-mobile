@@ -1,11 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
+import type { ColorValue } from 'react-native';
 
 import type { IconName } from '@/components/ui';
 import { useNotifications } from '@/lib/data';
 import { colors } from '@/lib/theme';
 
-const icon = (name: IconName) => ({ color, size }: { color: string; size: number }) => <Ionicons name={name} size={size} color={color} />;
+const icon = (name: IconName) => ({ color, size }: { color: ColorValue; size: number }) => <Ionicons name={name} size={size} color={color as string} />;
 
 export default function TabsLayout() {
   const notes = useNotifications();

@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import type { ComponentProps, ReactNode } from 'react';
 import {
   ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View,
-  type StyleProp, type TextInputProps, type ViewStyle,
+  type StyleProp, type TextInputProps, type TextProps, type ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -47,8 +47,8 @@ export function Card({ children, style, onPress }: { children: ReactNode; style?
 
 export const H1 = ({ children }: { children: ReactNode }) => <Text style={styles.h1}>{children}</Text>;
 export const H2 = ({ children }: { children: ReactNode }) => <Text style={styles.h2}>{children}</Text>;
-export const Body = ({ children, style }: { children: ReactNode; style?: any }) => <Text style={[styles.body, style]}>{children}</Text>;
-export const Muted = ({ children, style }: { children: ReactNode; style?: any }) => <Text style={[styles.muted, style]}>{children}</Text>;
+export const Body = ({ style, ...props }: TextProps) => <Text {...props} style={[styles.body, style]} />;
+export const Muted = ({ style, ...props }: TextProps) => <Text {...props} style={[styles.muted, style]} />;
 
 export function SectionTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
   return (
