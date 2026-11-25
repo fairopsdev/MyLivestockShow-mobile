@@ -31,7 +31,7 @@ export default function Forgot() {
           <>
             <Notice tone="success">If {email.trim()} has a Fair Central account, a reset link is on its way.</Notice>
             <Muted>Open the link in the email, choose a new password, then come back and sign in.</Muted>
-            <Button title="Back to sign in" onPress={() => router.back()} />
+            <Button title="Back to sign in" onPress={() => router.replace('/sign-in')} />
           </>
         ) : (
           <>
@@ -39,6 +39,7 @@ export default function Forgot() {
             <Field label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" autoComplete="email" />
             {error ? <Notice tone="error">{error}</Notice> : null}
             <Button title="Send reset link" onPress={send} loading={busy} />
+            <Button title="Back to sign in" variant="ghost" onPress={() => router.replace('/sign-in')} />
           </>
         )}
       </Card>
