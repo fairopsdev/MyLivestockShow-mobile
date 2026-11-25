@@ -21,4 +21,4 @@ jobs:
       - name: Lint
         run: npx expo lint
       - name: Bundle (Android and iOS)
-        run: npx expo export --platform android --platform ios --output-dir dist
+        run: npx expo export --platform all --output-dir dist
