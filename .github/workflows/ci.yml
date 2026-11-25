@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Expo dependency check
+        run: npx expo install --check
+      - name: Type check
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npx expo lint
+      - name: Bundle (Android and iOS)
+        run: npx expo export --platform android --platform ios --output-dir dist
