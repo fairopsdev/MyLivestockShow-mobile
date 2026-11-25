@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider, focusManager, useQueryClient } from '@tanstack/react-query';
 import * as Notifications from 'expo-notifications';
-import { Stack } from 'expo-router';
+import { router, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
@@ -38,13 +38,24 @@ export default function RootLayout() {
   );
 }
 
+const AUTH_SCREENS = ['sign-in', 'sign-up', 'forgot'];
+
 function Gate() {
   const { status } = useAuth();
   const signedIn = status === 'signedIn';
+  const segments = useSegments();
+  const onAuthScreen = AUTH_SCREENS.includes(String(segments[0] || ''));
 
   useEffect(() => {
     if (status !== 'loading') SplashScreen.hideAsync().catch(() => null);
   }, [status]);
+
+  // Signed out anywhere but the sign-in screens: always open Sign in.
+  // (Left to itself the router falls back to the first screen it is allowed
+  // to show, which is "Reset password".)
+  useEffect(() => {
+    if (status === 'signedOut' && !onAuthScreen) router.replace('/sign-in');
+  }, [status, onAuthScreen]);
 
   if (status === 'loading') return null;
 
