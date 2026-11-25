@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 
 import { call } from './api';
 import type {
@@ -88,3 +88,21 @@ export const usePrefs = () =>
 
 export const useProfile = () =>
   useQuery({ queryKey: keys.profile, queryFn: () => call<any>('exhibitorPortal', { action: 'profile' }) });
+
+// Several fairs at once (the "All my fairs" view).
+export const useFairsData = (ids: string[]) =>
+  useQueries({
+    queries: ids.map((id) => ({
+      queryKey: keys.fair(id),
+      queryFn: () => call<FairData>('exhibitorPortal', { action: 'fair', organization_id: id }),
+    })),
+  });
+
+export const useRings = (ids: string[]) =>
+  useQueries({
+    queries: ids.map((id) => ({
+      queryKey: keys.ring(id),
+      refetchInterval: 20_000,
+      queryFn: () => call<RingData>('mobileApp', { action: 'myRing', organization_id: id }),
+    })),
+  });

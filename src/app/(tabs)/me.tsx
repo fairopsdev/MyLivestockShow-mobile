@@ -4,6 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { Alert, Text, View } from 'react-native';
 
 import { Badge, Card, Muted, Row, Screen, SectionTitle } from '@/components/ui';
+import { accountName } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { WEB_URL } from '@/lib/config';
 import { useAccount, useConversations, useDocuments, useNotifications } from '@/lib/data';
@@ -23,7 +24,7 @@ export default function Me() {
   return (
     <Screen>
       <Card>
-        <Text style={{ fontSize: 22, fontWeight: '800', color: colors.navy }}>{user?.full_name || 'Your account'}</Text>
+        <Text style={{ fontSize: 22, fontWeight: '800', color: colors.navy }}>{accountName(user).full || 'Your account'}</Text>
         <Muted>{user?.email}</Muted>
       </Card>
 

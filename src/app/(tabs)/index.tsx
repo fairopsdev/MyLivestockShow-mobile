@@ -5,8 +5,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FairSwitcher } from '@/components/FairSwitcher';
 import { Badge, Button, Card, Empty, Loading, Muted, Row, Screen, SectionTitle, type IconName } from '@/components/ui';
+import { accountName } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import { useAccount, useConversations, useDocuments, useFair, useNotifications, useRing, useWeighIn } from '@/lib/data';
+import { useAccount, useConversations, useDocuments, useFairsData, useNotifications, useRings, useWeighIn } from '@/lib/data';
 import { useCurrentFair } from '@/lib/fair';
 import { ago, entryTitle, placingText } from '@/lib/format';
 import { pushPermission, registerForPush, type PushState } from '@/lib/push';
@@ -16,10 +17,11 @@ type Todo = { key: string; icon: IconName; color: string; title: string; subtitl
 
 export default function Home() {
   const { user } = useAuth();
-  const { fair } = useCurrentFair();
+  const { scope, allMode } = useCurrentFair();
+  const ids = scope.map((f) => f.id);
   const account = useAccount();
-  const fairData = useFair(fair?.id);
-  const ring = useRing(fair?.id);
+  const fairData = useFairsData(ids);
+  const rings = useRings(ids);
   const weigh = useWeighIn();
   const docs = useDocuments();
   const convs = useConversations();
@@ -30,11 +32,11 @@ export default function Home() {
     pushPermission().then(setPush).catch(() => null);
   }, []);
 
-  const refreshing = account.isRefetching || fairData.isRefetching || ring.isRefetching;
+  const refreshing = account.isRefetching || fairData.some((q) => q.isRefetching) || rings.some((q) => q.isRefetching);
   const refresh = () => {
     account.refetch();
-    fairData.refetch();
-    ring.refetch();
+    fairData.forEach((q) => q.refetch());
+    rings.forEach((q) => q.refetch());
     weigh.refetch();
     docs.refetch();
     convs.refetch();
@@ -70,10 +72,18 @@ export default function Home() {
     subtitle: unreadConvs[0].subject, go: () => router.push('/messages'),
   });
 
-  const upNext = (ring.data?.my_classes || []).filter((c) => c.state !== 'later').slice(0, 3);
-  const later = (ring.data?.my_classes || []).filter((c) => c.state === 'later');
-  const placed = (fairData.data?.entries || []).filter((e) => e.result).slice(0, 3);
-  const first = (user?.full_name || '').split(' ')[0];
+  // Every fair in view, together. With more than one fair each item says which fair it is.
+  const where = (fairIndex: number, ringName: string) => (allMode ? `${scope[fairIndex]?.name} · ${ringName}` : ringName);
+  const myClasses = rings
+    .flatMap((q, i) => (q.data?.my_classes || []).map((c) => ({ ...c, where: where(i, c.ring_name) })))
+    .sort((a, b) => a.classes_ahead - b.classes_ahead);
+  const upNext = myClasses.filter((c) => c.state !== 'later').slice(0, 3);
+  const later = myClasses.filter((c) => c.state === 'later');
+  const placed = fairData
+    .flatMap((q, i) => (q.data?.entries || []).filter((e) => e.result).map((e) => ({ ...e, fairName: scope[i]?.name })))
+    .sort((a, b) => (b.created_date || '').localeCompare(a.created_date || ''))
+    .slice(0, allMode ? 5 : 3);
+  const first = accountName(user).first;
   const unread = notes.data?.unread || 0;
 
   return (
@@ -101,7 +111,7 @@ export default function Home() {
         <Card key={`${c.ring_id}-${c.class_id}`} onPress={() => router.navigate({ pathname: '/live', params: { tab: 'ring' } })}
           style={c.state === 'in_ring' ? s.inRing : s.onDeck}>
           <Text style={[s.upLabel, { color: c.state === 'in_ring' ? '#fff' : colors.navy }]}>
-            {c.state === 'in_ring' ? 'IN THE RING NOW' : 'ON DECK'} · {c.ring_name}
+            {c.state === 'in_ring' ? 'IN THE RING NOW' : 'ON DECK'} · {c.where}
           </Text>
           <Text style={[s.upClass, { color: c.state === 'in_ring' ? '#fff' : colors.navy }]}>{c.class_name}</Text>
           <Text style={{ color: c.state === 'in_ring' ? '#E8EEF8' : colors.muted }}>
@@ -139,7 +149,7 @@ export default function Home() {
           <Card style={{ padding: 0 }}>
             {later.slice(0, 5).map((c, i, arr) => (
               <Row key={`${c.ring_id}-${c.class_id}`} icon="time" title={c.class_name}
-                subtitle={`${c.ring_name} · ${c.classes_ahead} ${c.classes_ahead === 1 ? 'class' : 'classes'} ahead`}
+                subtitle={`${c.where} · ${c.classes_ahead} ${c.classes_ahead === 1 ? 'class' : 'classes'} ahead`}
                 onPress={() => router.navigate({ pathname: '/live', params: { tab: 'ring' } })} last={i === arr.length - 1} />
             ))}
           </Card>
@@ -154,7 +164,7 @@ export default function Home() {
           <Card style={{ padding: 0 }}>
             {placed.map((e, i) => (
               <Row key={e.id} icon={e.result?.is_champion ? 'trophy' : 'ribbon'} iconColor={colors.gold} title={entryTitle(e)}
-                subtitle={`${e.class_name || ''}`} right={<Badge label={placingText(e.result)} fg={colors.navy} bg={colors.goldSoft} />}
+                subtitle={[e.class_name, allMode ? e.fairName : ''].filter(Boolean).join(' · ')} right={<Badge label={placingText(e.result)} fg={colors.navy} bg={colors.goldSoft} />}
                 onPress={() => router.push({ pathname: '/entry/[id]', params: { id: e.id } })} last={i === placed.length - 1} />
             ))}
           </Card>

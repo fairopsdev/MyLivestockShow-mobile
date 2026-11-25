@@ -12,7 +12,8 @@ import { date } from '@/lib/format';
 import { colors } from '@/lib/theme';
 
 const FIELDS: [string, string, object?][] = [
-  ['full_name', 'Full name'],
+  ['first_name', 'First name', { autoComplete: 'given-name' }],
+  ['last_name', 'Last name', { autoComplete: 'family-name' }],
   ['phone', 'Phone', { keyboardType: 'phone-pad', autoComplete: 'tel' }],
   ['address', 'Street address', { autoComplete: 'street-address' }],
   ['city', 'City'],

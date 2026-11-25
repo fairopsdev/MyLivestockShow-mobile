@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
-import { auth, loadToken, saveToken, setSignedOutHandler, type AccountUser } from './api';
+import { auth, call, loadToken, saveToken, setSignedOutHandler, type AccountUser } from './api';
 import { unregisterPush } from './push';
 
 type Status = 'loading' | 'signedOut' | 'signedIn';
@@ -11,7 +11,7 @@ type AuthValue = {
   user: AccountUser | null;
   signIn: (email: string, password: string) => Promise<void>;
   /** After sign-up: confirm the emailed code, which signs the person in. */
-  confirmSignUp: (email: string, code: string, fullName: string) => Promise<void>;
+  confirmSignUp: (email: string, code: string, firstName: string, lastName: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
 };
@@ -62,11 +62,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!res?.access_token) throw new Error('Sign-in failed. Check your email and password.');
       await finish(res.access_token, res.user);
     },
-    confirmSignUp: async (email, code, fullName) => {
+    confirmSignUp: async (email, code, firstName, lastName) => {
       const res = await auth.verifyOtp(email.trim().toLowerCase(), code.trim());
       if (!res?.access_token) throw new Error('That code did not work. Check it and try again.');
       await saveToken(res.access_token);
-      if (fullName.trim()) await auth.updateMe({ full_name: fullName.trim() }).catch(() => null);
+      // Fair Central keeps the account's first and last name itself.
+      await call('exhibitorPortal', { action: 'saveAccount', account: { first_name: firstName.trim(), last_name: lastName.trim() } }).catch(() => null);
       await finish(res.access_token);
     },
     signOut: async () => {

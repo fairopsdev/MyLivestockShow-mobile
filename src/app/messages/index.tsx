@@ -10,11 +10,13 @@ import { colors } from '@/lib/theme';
 
 export default function Messages() {
   const q = useConversations();
-  const { fair } = useCurrentFair();
+  const { fair, fairs } = useCurrentFair();
   return (
     <Screen refreshing={q.isRefetching} onRefresh={() => q.refetch()}>
       {fair ? (
         <Button title={`Message ${fair.name}`} icon="create" onPress={() => router.push({ pathname: '/messages/new', params: { organization_id: fair.id } })} />
+      ) : fairs.length ? (
+        <Button title="Message a show office" icon="create" onPress={() => router.push('/messages/new')} />
       ) : null}
       {q.isLoading ? <Loading /> : null}
       {q.error ? <Notice tone="error">{errorText(q.error)}</Notice> : null}
