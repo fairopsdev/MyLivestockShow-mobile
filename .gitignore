@@ -22,3 +22,7 @@ yarn-error.*
 *.tsbuildinfo
 /ios
 /android
+
+# Firebase / Google service account keys (never commit)
+*firebase-adminsdk*.json
+*service-account*.json
