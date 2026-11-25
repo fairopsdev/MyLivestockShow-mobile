@@ -77,7 +77,21 @@ export function call<T = any>(name: string, payload: Record<string, unknown> = {
   return request<T>(`/functions/${name}`, { method: 'POST', body: payload });
 }
 
-export type AccountUser = { id: string; email: string; full_name?: string };
+export type AccountUser = { id: string; email: string; full_name?: string; first_name?: string; last_name?: string; data?: Record<string, any> };
+
+/** The account holder's name: Fair Central's first/last name, never the email's start. */
+export function accountName(user?: AccountUser | null) {
+  const first = String(user?.first_name ?? user?.data?.first_name ?? '').trim();
+  const last = String(user?.last_name ?? user?.data?.last_name ?? '').trim();
+  if (first || last) return { first, last, full: `${first} ${last}`.trim() };
+  const full = String(user?.full_name ?? '').trim();
+  const prefix = String(user?.email || '').split('@')[0].toLowerCase();
+  if (full && full.toLowerCase() !== prefix && !full.includes('@')) {
+    const parts = full.split(/\s+/);
+    return { first: parts[0], last: parts.slice(1).join(' '), full };
+  }
+  return { first: '', last: '', full: '' };
+}
 
 export const auth = {
   login: (email: string, password: string) =>

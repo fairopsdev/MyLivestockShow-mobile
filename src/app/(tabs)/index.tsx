@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FairSwitcher } from '@/components/FairSwitcher';
 import { Badge, Button, Card, Empty, Loading, Muted, Row, Screen, SectionTitle, type IconName } from '@/components/ui';
+import { accountName } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useAccount, useConversations, useDocuments, useFair, useNotifications, useRing, useWeighIn } from '@/lib/data';
 import { useCurrentFair } from '@/lib/fair';
@@ -73,7 +74,7 @@ export default function Home() {
   const upNext = (ring.data?.my_classes || []).filter((c) => c.state !== 'later').slice(0, 3);
   const later = (ring.data?.my_classes || []).filter((c) => c.state === 'later');
   const placed = (fairData.data?.entries || []).filter((e) => e.result).slice(0, 3);
-  const first = (user?.full_name || '').split(' ')[0];
+  const first = accountName(user).first;
   const unread = notes.data?.unread || 0;
 
   return (

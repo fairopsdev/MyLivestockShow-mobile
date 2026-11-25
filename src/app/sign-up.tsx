@@ -11,7 +11,8 @@ import { colors } from '@/lib/theme';
 export default function SignUp() {
   const { confirmSignUp } = useAuth();
   const [step, setStep] = useState<'details' | 'code'>('details');
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -22,7 +23,7 @@ export default function SignUp() {
 
   const register = async () => {
     setError('');
-    if (!name.trim()) return setError('Enter your full name.');
+    if (!firstName.trim() || !lastName.trim()) return setError('Enter your first and last name.');
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) return setError('Enter a valid email.');
     if (password.length < 8) return setError('Use at least 8 characters for your password.');
     if (password !== confirm) return setError('The passwords do not match.');
@@ -42,7 +43,7 @@ export default function SignUp() {
     if (!code.trim()) return setError('Enter the code from your email.');
     setBusy(true);
     try {
-      await confirmSignUp(email, code, name);
+      await confirmSignUp(email, code, firstName, lastName);
     } catch (e) {
       setError(errorText(e));
     } finally {
@@ -81,7 +82,8 @@ export default function SignUp() {
     <Screen>
       <Card>
         <Muted>One Fair Central account works at every fair, on the web and in this app.</Muted>
-        <Field label="Full name" value={name} onChangeText={setName} autoComplete="name" textContentType="name" />
+        <Field label="First name" value={firstName} onChangeText={setFirstName} autoComplete="given-name" textContentType="givenName" />
+        <Field label="Last name" value={lastName} onChangeText={setLastName} autoComplete="family-name" textContentType="familyName" />
         <Field label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
           autoComplete="email" textContentType="emailAddress" />
         <Field label="Password" value={password} onChangeText={setPassword} secureTextEntry autoComplete="new-password"
