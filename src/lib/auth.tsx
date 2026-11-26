@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 
 import { auth, call, loadToken, saveToken, setSignedOutHandler, type AccountUser } from './api';
 import { unregisterPush } from './push';
+import { signInWithBrowser } from './browserSignIn';
 
 type Status = 'loading' | 'signedOut' | 'signedIn';
 
@@ -10,6 +11,8 @@ type AuthValue = {
   status: Status;
   user: AccountUser | null;
   signIn: (email: string, password: string) => Promise<void>;
+  /** Google or any other website sign-in, in a browser window. False if they closed it. */
+  signInWithBrowser: () => Promise<boolean>;
   /** After sign-up: confirm the emailed code, which signs the person in. */
   confirmSignUp: (email: string, code: string, firstName: string, lastName: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -61,6 +64,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await auth.login(email.trim().toLowerCase(), password);
       if (!res?.access_token) throw new Error('Sign-in failed. Check your email and password.');
       await finish(res.access_token, res.user);
+    },
+    signInWithBrowser: async () => {
+      const token = await signInWithBrowser();
+      if (!token) return false;
+      await finish(token);
+      return true;
     },
     confirmSignUp: async (email, code, firstName, lastName) => {
       const res = await auth.verifyOtp(email.trim().toLowerCase(), code.trim());

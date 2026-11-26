@@ -9,11 +9,23 @@ import { useAuth } from '@/lib/auth';
 import { colors, space } from '@/lib/theme';
 
 export default function SignIn() {
-  const { signIn } = useAuth();
+  const { signIn, signInWithBrowser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+
+  const withBrowser = async () => {
+    setError('');
+    setBusy(true);
+    try {
+      await signInWithBrowser();
+    } catch (e) {
+      setError(errorText(e));
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const submit = async () => {
     setError('');
@@ -45,6 +57,8 @@ export default function SignIn() {
                 textContentType="password" returnKeyType="go" onSubmitEditing={submit} />
               {error ? <Notice tone="error">{error}</Notice> : null}
               <Button title="Sign in" onPress={submit} loading={busy} />
+                <Text style={s.or}>or</Text>
+                <Button title="Continue with Google" icon="logo-google" variant="secondary" onPress={withBrowser} disabled={busy} />
               <Link href="/forgot" style={s.link}>Forgot password?</Link>
             </View>
             <View style={{ alignItems: 'center', gap: space.sm }}>
@@ -64,6 +78,7 @@ export default function SignIn() {
 }
 
 const s = StyleSheet.create({
+  or: { color: colors.muted, textAlign: 'center', fontSize: 14, fontWeight: '600' },
   wrap: { flexGrow: 1, justifyContent: 'center', padding: space.xl, gap: space.xl },
   brand: { alignItems: 'center', gap: space.sm },
   logo: { width: 84, height: 84, borderRadius: 20 },
